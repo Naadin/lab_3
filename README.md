@@ -70,14 +70,119 @@ docker ps -a
 
 ## Часть 2. Описание стека в `docker-compose.yml`
 
-![]()
+```bash
+#создадим папку rocketcounter
+mkdir rocketcounter
+#перейдем в нее
+cd rocketcounter
+```
+
+![make.png](make.png)
+
+Создадим в ней файл:
+
+```bash
+notepad docker-compose.yml
+```
+
+Запишем туда текст:
+
+![file.png](file.png)
+
+Тут мы описали требования для стека. В файле описаны два сервиса: `redis` (база данных) и `rocketcounter` (приложение). Связь между ними обеспечивается автоматически: Compose создаёт общую сеть для проекта. 
+
+```bash
+#запустим стек
+docker compose up -d
+```
+
+![create.png](create.png)
+
+```bash
+#проверим
+docker compose ps
+```
+
+![compose_ps.png](compose_ps.png)
+
+Откроем `localhost` и понажимаем на кнопочку `GET A ROCKET`:
+
+![get_1.png](get_1.png)
+
+![get01.png](get01.png)
+
+Счетчик работает, все корректно.
 
 ## Часть 3. Масштабирование приложения
 
+```bash
+#откроем файл
+notepad docker-compose.yml
+```
 
+И изменим порт:
+
+![new_port.png](new_port.png)
+
+Таким образом, хост выберет свободный порт автоматически.
+
+Применим изменения и запустим 2 экземпляра:
+
+```bash
+docker compose up -d --scale rocketcounter=2
+```
+
+![new_up.png](new_up.png)
+
+```bash
+#посмотрим
+docker compose ps
+```
+
+![new_ps.png](new_ps.png)
+
+Docker автоматически выдал разные свободные порты для двух копий приложения.
+
+Зайдем на `http://localhost:32768` и понажимаем на кнопочку:
+
+![15.png](15.png)
+
+Остановимся на 15.
+
+Затем зайдем на `http://localhost:32769` и увидим, что счетчик начинается как раз с 15:
+
+![16.png](16.png)
+
+Счетчик для них общий (хранится в одном `Redis`). Масштабирование работает.
 
 ## Часть 4. Полное уничтожение стека
 
+Выполним команду для полной очистки окружения, созданного через Docker Compose:
 
+```bash
+docker compose down -v
+```
+
+![down.png](down.png)
+
+Проверим, что ничего не осталось:
+
+```bash
+#посмотрим
+docker ps -a
+```
+
+![psss.png](psss.png)
+
+Пусто, остались только старые контейнеры.
+
+```bash
+#посмотрим сети
+docker network ls
+```
+
+![link.png](link.png)
+
+Тут тоже только старые. Очистка выполнена.
 
 ## Вопросы
